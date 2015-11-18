@@ -14,7 +14,14 @@ class MoviesController < ApplicationController
     @all_ratings = Movie.all_ratings
     if params[:sort] 
       #@movies = Movie.order(params[:sort]).where(rating: params[:ratings].keys)
-      @movies = Movie.order(params[:sort]).all
+      if params[:rating]
+	session[:ratings] = params[:rating]
+      end
+      if session[:ratings]
+        @movies = Movie.order(params[:sort]).where(rating: session[:ratings].keys)
+      else
+        @movies = Movie.order(params[:sort]).all
+      end
       if params[:sort] == 'title'
         @title_hilite = 'hilite'
         @release_date_hilite = ''
@@ -24,7 +31,10 @@ class MoviesController < ApplicationController
       end	
     else
       if params[:ratings]
-        @movies = Movie.where(rating: params[:ratings].keys)
+	session[:ratings] = params[:ratings]
+      end
+      if session[:ratings]
+        @movies = Movie.where(rating: session[:ratings].keys)
       else
 	@movies = Movie.all
       end
