@@ -1,5 +1,3 @@
-require 'byebug'
-
 class MoviesController < ApplicationController
 
   def movie_params
