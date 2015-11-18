@@ -1,3 +1,5 @@
+require 'byebug'
+
 class MoviesController < ApplicationController
 
   def movie_params
@@ -11,7 +13,9 @@ class MoviesController < ApplicationController
   end
 
   def index
+    @all_ratings = Movie.all_ratings
     if params[:sort] 
+      #@movies = Movie.order(params[:sort]).where(rating: params[:ratings].keys)
       @movies = Movie.order(params[:sort]).all
       if params[:sort] == 'title'
         @title_hilite = 'hilite'
@@ -21,7 +25,11 @@ class MoviesController < ApplicationController
         @release_date_hilite = 'hilite'
       end	
     else
-      @movies = Movie.all
+      if params[:ratings]
+        @movies = Movie.where(rating: params[:ratings].keys)
+      else
+	@movies = Movie.all
+      end
     end
   end
 
