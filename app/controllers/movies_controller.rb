@@ -40,10 +40,10 @@ class MoviesController < ApplicationController
       end
     end
     if params[:sort] and params[:ratings]
-      #Refactor
+	    #refactor
     else
       flash.keep
-      redirect_to movies_path(sort: session[:sort], ratings: session[:ratings])
+#      redirect_to movies_path(sort: session[:sort], ratings: session[:ratings])
     end
   end
 
