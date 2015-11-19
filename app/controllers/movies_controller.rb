@@ -1,3 +1,4 @@
+require 'byebug'
 class MoviesController < ApplicationController
 
   def movie_params
@@ -12,38 +13,38 @@ class MoviesController < ApplicationController
 
   def index
     @all_ratings = Movie.all_ratings
-    if params[:sort] 
-      session[:sort] = params[:sort]
-      if params[:rating]
-	session[:ratings] = params[:rating]
-      end
-      if session[:ratings]
-        @movies = Movie.order(params[:sort]).where(rating: session[:ratings].keys)
+   
+    if params[:ratings]
+      @selected_ratings = session[:ratings] = params[:ratings]
+      if params[:sort]
+        @sort = session[:sort] = params[:sort]
+	@movies = Movie.order(@sort).where(rating: @selected_ratings.keys)
+	@title_hilite = 'hilite' if @sort == 'title'
+	@release_date_hilite = 'hilite' if @sort == 'release_date'
       else
-        @movies = Movie.order(params[:sort]).all
+	@movies = Movie.where(rating: @selected_ratings.keys)
       end
-      if params[:sort] == 'title'
-        @title_hilite = 'hilite'
-        @release_date_hilite = ''
-      else
-        @title_hilite = ''
-        @release_date_hilite = 'hilite'
-      end	
     else
-      if params[:ratings]
-	session[:ratings] = params[:ratings]
+      if session[:sort]
+        @sort = session[:sort]
       end
+
       if session[:ratings]
-        @movies = Movie.where(rating: session[:ratings].keys)
+	@selected_ratings = session[:ratings]
       else
-	@movies = Movie.all
+        initial_ratings = {}
+        @all_ratings.each do |rating|
+          initial_ratings["#{rating}"] = "ratings[#{rating}]"
+        end
+        @selected_ratings = initial_ratings
       end
-    end
-    if params[:sort] and params[:ratings]
-	    #refactor
-    else
+      @movies = Movie.all
       flash.keep
-#      redirect_to movies_path(sort: session[:sort], ratings: session[:ratings])
+      if @sort
+        redirect_to movies_path(sort: @sort, ratings: @selected_ratings) and return
+      else
+        redirect_to movies_path(ratings: @selected_ratings) and return
+      end 
     end
   end
 
